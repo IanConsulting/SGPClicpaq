@@ -1,0 +1,93 @@
+﻿@page "/viajesdepo"
+<h1>Viajes</h1>
+<p>Descripción viajes depósito</p>
+<hr />
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10"
+                AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" EmptyText="No hay viajes para mostrar."
+                Data="@oRespuesta.List" TItem="Viaje" ColumnWidth="250px" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="Viaje" Property="Id" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Viaje" Property="ZonaDestino" Title="ZonaDestino" Width="100px" />
+        <RadzenDataGridColumn TItem="Viaje" Property="Unidad" Title="Unidad" Width="100px" />
+        <RadzenDataGridColumn TItem="Viaje" Property="" Title="Chofer" Width="80px">
+            <Template Context="data">
+                <a>@getChofer(data.Chofer)</a>
+            </Template>
+        </RadzenDataGridColumn>        <RadzenDataGridColumn TItem="Viaje" Property="Transporte" Title="Transporte" Width="100px" />
+
+
+        <RadzenDataGridColumn TItem="Viaje" Property="" Title="" Frozen="true" Sortable="false" Filterable="false" Width="50px">
+            <Template Context="data">
+                <button class="btn btn-outline-success" @onclick="() => gotocarga(data.Id)"><FeatherTruck Color="black"></FeatherTruck></button>
+            </Template>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Viaje" Property="" Title="" Frozen="true" Sortable="false" Filterable="false" Width="50px">
+            <Template Context="data">
+                <button class="btn btn-outline-primary" @onclick="() => info(data.Id)"><FeatherInfo Color="black"></FeatherInfo></button>
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+
+
+@code {
+    Respuesta<List<Viaje>> oRespuesta = new();
+    Respuesta<List<Chofer>> oRtaChoferes = new();
+
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Get();
+    }
+
+    async Task Get()
+    {
+        oRtaChoferes = await http.GetFromJsonAsync<Respuesta<List<Chofer>>>("/api/chofer");
+
+        var respuesta = await http.GetFromJsonAsync<Respuesta<List<Viaje>>>("/api/Viaje");
+        oRespuesta = respuesta;
+        oRespuesta.List = respuesta.List.Where(x => x.Estado == "Deposito").ToList();
+        StateHasChanged();
+    }
+
+    string getChofer(decimal? id)
+    {
+        var nombre = oRtaChoferes.List.Where(x => x.Legajo == id).First().Nombre;
+        var apellido = oRtaChoferes.List.Where(x => x.Legajo == id).First().Apellido;
+        var completo = nombre + " " + apellido;
+        return (completo);
+    }
+
+    async Task gotocarga(int id)
+    {
+        nav.NavigateTo($"/carga/{id}");
+    }
+
+    async Task info(int id)
+    {
+        var parameters = new ModalParameters();
+        parameters.Add(nameof(ModalInfo.id), id);
+        var options = new ModalOptions()
+            {
+                HideHeader = true
+            };
+
+        var formModal = Modal.Show<ModalInfo>("", parameters, options);
+        var result = await formModal.Result;
+        if (result.Cancelled)
+        {
+            Console.WriteLine("Modal was cancelled");
+        }
+        else
+        {
+            await OnInitializedAsync();
+            StateHasChanged();
+        }
+    }
+}
+
+

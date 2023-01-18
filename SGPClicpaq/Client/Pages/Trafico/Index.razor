@@ -1,0 +1,74 @@
+﻿@page "/trafico"
+<h1>Tráfico</h1>
+<a>Gestión de tráfico</a>
+<hr />
+
+<div class="row">
+    <div class="col-md-4 col-xl-6">
+        <div class="card text-white bg-primary">
+            <div class="card-header">Viajes</div>
+            <div class="card-body">
+                <p class="card-text">Descripción de viajes</p>
+                <a href="viajes" class="btn btn-dark" style="float: right;">Ver viajes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-6">
+        <div class="card text-white bg-primary">
+            <div class="card-header">Viajes en deposito</div>
+            <div class="card-body">
+                <p class="card-text">Descripción</p>
+                <a href="edicionviajes" class="btn btn-dark" style="float: right;">Ver viajes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="row">
+
+    <div class="col-md-4 col-xl-6">
+        <div class="card text-white bg-primary">
+            <div class="card-header">Viajes para confirmar</div>
+            <div class="card-body">
+                @if (tot > 0)
+                {
+                    if (tot == 1)
+                    {
+                        <p class="card-text">Hay @tot viaje para confirmar</p>
+                    }
+                    else
+                    {
+                        <p class="card-text">Hay @tot viajes para confirmar</p>
+                    }
+                }
+                else
+                {
+                    <p class="card-text">Descripción</p>
+                }
+                <a href="confirmaviajes" class="btn btn-dark" style="float: right;">Ver viajes</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-6">
+        <div class="card text-white bg-primary">
+            <div class="card-header">Viajes confirmados</div>
+            <div class="card-body">
+                <p class="card-text">Descripción</p>
+                <a href="confirmados" class="btn btn-dark" style="float: right;">Ver viajes</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    int tot;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var respuesta = await http.GetFromJsonAsync<Respuesta<List<Viaje>>>("/api/Viaje");
+        tot = respuesta.List.Where(x => x.Estado == "ParaConfirmar").Count();
+        StateHasChanged();
+    }
+}

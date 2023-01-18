@@ -1,0 +1,55 @@
+﻿Barra de progreso (en bultos, guias o que?) -> no, porcentajes y todo junto (colores en funcion de progreso)  (sobre guias, peso y volumen)
+para eso hay que rehacer las dos cards de carga que muestran el total y el parcial (de backend esta todo, falta mostrarlo distinto)
+
+
+Sobre trazabilidad:
+	para cargar una guia se fija el hrut asi que esta todo bien con eso, un kilombo menos
+
+	no impactar trazabilidad hasta que se manda a deposito el viaje, pero ojo con si se trae de vuelta
+
+	pero mas importante impactar si se cargo un viaje sin completar la lista de guias, porque no se incluyeron las que faltan (osea llenar el campo observacion)
+	(para esto se tiene que abrir una lista desplegable de unas pocas trazabilidades (ver cuales) y seleccionar una de esas y guardar el codigo)
+		
+	para impactar que esta en carga y luego que se cargo en camion esperar a que el viaje se termine por completo y usar los datetimes que guardamos en la clase viaje para impactar todas las trazabilidades de una
+
+	siempre que se impacta una trazabilidad hay que impactar en guia.estado que esa es la ultima (no esta creado el post nisquiera)
+
+
+
+Hansel:
+
+	hacer que en creaviaje entre toda la info de las guias (como cuando pones el zoom en 80%)(si se puede mejorar la visualizacion de todo mejor)
+	que cuando de enter se apreten los botones (especialmente el agregar guia en creaviaje pero otros tambien)
+	carga camion directa o en dos pasos -> se pickea donde se deja y eso dice todo
+	que diga Bulto 1 en vez de 13S1 (esto tiene un problema con identificar que bulto es de cada guia para chequearlo) (se soluciona si dice "Bulto 1 (13)" o algo asi)
+	cuando rehagas el entorno de carga agregale el terminar viaje sin todas las guias (y colorcitos)
+	que la barra de costado se pueda esconder y cambiarle el color azul por rojo (y otros azules por rojos si quedan)
+	
+
+Cosas que no entiendo xd:
+
+	Volumen total se muestra en int (en carga) ¿¿¿¿???? nosense
+	poner cantidades en cosas ¿? (en algun momento lo anote y no se que era xdxd)
+
+
+Siguiente etapa:
+	(tiene que ver con impresion) tener lista de rutas que le den formato al viaje (van a tener cosas como donde descansar, donde cargar nasta, donde no hay señal)(eso se esta haciendo y se consumira de un link)
+
+
+Ya hecho:
+
+Mandar a depo solo si hay dominio y guias
+en viajes el alertaconfirmar es warning
+Dominio: que busque por dominio y legajo (doneish)
+mostrar bien los viajes que hay para confirmar y eso
+Creaviaje:	Chofer: que guarde el legajo en vez de nombre (cambiar en bbdd)
+-> chequeo guia.estado, eso me da un codigo de trazabilidad, busco la trazabilidad de ese codigo y ahi miro el hrut
+	hrut ¿? -> trazabilidad.hrut tiene que estar en 1 en la ultima trazabilidad de la guia para que pueda entrar a un viaje
+codclie se busca en la table cliente
+y algunas cosas mas xd
+
+
+
+
+
+

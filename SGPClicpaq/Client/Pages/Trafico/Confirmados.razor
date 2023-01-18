@@ -1,0 +1,50 @@
+﻿@page "/confirmados"
+<h1>Viajes confirmados</h1>
+<p>Descripción</p>
+<hr />
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="10"
+                AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true" EmptyText="No hay viajes para mostrar."
+                Data="@oRespuesta.List" TItem="Viaje" ColumnWidth="250px" LogicalFilterOperator="LogicalFilterOperator.Or">
+    <Columns>
+        <RadzenDataGridColumn TItem="Viaje" Property="Id" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn TItem="Viaje" Property="ZonaDestino" Title="Zona de destino" Width="120px" />
+        <RadzenDataGridColumn TItem="Viaje" Property="Unidad" Title="Unidad" Width="80px" />
+        <RadzenDataGridColumn TItem="Viaje" Property="" Title="Chofer" Width="80px">
+            <Template Context="data">
+                <a>@getChofer(data.Chofer)</a>
+            </Template>
+        </RadzenDataGridColumn>
+
+
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    Respuesta<List<Viaje>> oRespuesta = new();
+    Respuesta<List<Chofer>> oRtaChoferes = new();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Get();
+    }
+
+    async Task Get()
+    {
+        oRtaChoferes = await http.GetFromJsonAsync<Respuesta<List<Chofer>>>("/api/chofer");
+
+        var respuesta = await http.GetFromJsonAsync<Respuesta<List<Viaje>>>("/api/Viaje");
+        oRespuesta = respuesta;
+        oRespuesta.List = respuesta.List.Where(x => x.Estado == "Confirmado").ToList();
+        StateHasChanged();
+    }
+
+    string getChofer(decimal? id)
+    {
+        var nombre = oRtaChoferes.List.Where(x => x.Legajo == id).First().Nombre;
+        var apellido = oRtaChoferes.List.Where(x => x.Legajo == id).First().Apellido;
+        var completo = nombre + " " + apellido;
+        return (completo);
+    }
+}

@@ -1,0 +1,236 @@
+﻿@page "/carga/{id:int}"
+<h3>Carga del viaje @id</h3>
+<a>Descripcion</a>
+<hr />
+
+<button class="btn btn-rounded btn-outline-info" @onclick=gotoviajesdepo><FeatherArrowLeft Color="blue" /></button>
+<div class="row">
+    <div class="col-md-4 col-xl-4">
+        <RadzenCard Class="m-3">
+            @if (oViaje.TotalGuias == tGuias)
+            {
+                <EditForm Model="@oViaje">
+                    <InputText class="form-control" @bind-Value="@oViaje.ObservCargado" placeholder="Observaciones de la carga" />
+                </EditForm>
+                <button class="btn btn-rounded btn-outline-success" @onclick=alertaTerminar style="float:right;">Finalizar carga</button>
+            }
+            <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 100%" Data=@objeto1>
+                <RadzenTreeLevel Expanded="@(data => @expand)" TextProperty="Guia" ChildrenProperty="Bultos" />
+                <RadzenTreeLevel TextProperty="" HasChildren="@(data => false)" />
+            </RadzenTree>
+        </RadzenCard>
+    </div>
+    <div class="col-md-4 col-xl-4">
+        <RadzenCard Class="m-3">
+            <div class="d-flex flex-row p-3">
+                <div>
+                    <h3><strong>Info carga</strong></h3>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-1 mb-0">Guias cargadas</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1">
+                        <b>
+                            @foreach (var a in jaja)
+                            {
+                                @a
+                                <a>&nbsp;</a>
+                            }
+                        </b>
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Cantidad de guias cargadas</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@tGuias</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Bultos cargados</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@tBultos</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Volumen cargado</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@tVolumen</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Peso cargado</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@tPeso</b></RadzenText>
+                </div>
+            </div>
+        </RadzenCard>
+    </div>
+    <div class="col-md-4 col-xl-4">
+        <RadzenCard Class="m-3">
+            <div class="d-flex flex-row p-3">
+                <div>
+                    <h3><strong>Info viaje</strong></h3>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-1 mb-0">Guias</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1">
+                        <b>
+                            @foreach (var a in oGuias)
+                            {
+                                @a.Guia
+                                <a>&nbsp;</a>
+                            }
+                        </b>
+                    </RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Cantidad de guías</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@oViaje.TotalGuias</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Cantidad total de bultos</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@oViaje.TotalBultos</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Volumen total</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@oViaje.TotalVolumen</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" Class="d-flex mt-3 mb-0">Peso total</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@oViaje.TotalPeso</b></RadzenText>
+                </div>
+            </div>
+        </RadzenCard>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 col-xl-12">
+        <RadzenCard Class="m-3">
+            <RadzenProgressBar Value="@tBultos" Max="@totalBultos" />
+        </RadzenCard>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int id { get; set; }
+    Viaje oViaje = new();
+    Respuesta<Viaje> oRtaViaje = new();
+    List<Guium> oGuias = new();
+    List<obj1> objeto1 = new();
+    IEnumerable<object> checkedValues;
+    bool expand = true;
+    double totalBultos = 0;
+
+    List<Guium> guiasCargadas = new();
+    int tGuias;
+    int tBultos = 0;
+    int tPeso;
+    decimal tVolumen;
+    List<string> jaja = new();
+
+    IEnumerable<object> CheckedValues
+    {
+        get => checkedValues;
+        set
+        {
+            checkedValues = value;
+            if (checkedValues != null)
+            {
+                tBultos = 0;
+                tGuias = 0;
+                tPeso = 0;
+                tVolumen = 0;
+                int tpeso = 0;
+                decimal tvolumen = 0;
+                decimal numero = 0;
+                string j;
+                List<string> list = new();
+                jaja.Clear();
+                foreach (var cosa in checkedValues)
+                {
+                    if (cosa is string)
+                    {
+                        tBultos = tBultos + 1;
+
+                        list.Add(cosa.ToString());
+                        j = cosa.ToString().Split('S')[0];
+                        foreach (var guia in oGuias)
+                        {
+                            if (Convert.ToInt32(j) == guia.Guia)
+                            {
+                                numero = guia.Bulto;
+                                tvolumen += guia.Volumen;
+                                tpeso = (int)guia.Peso;
+                            }
+                        }
+                        if (list.Where(x => x.Split('S')[0] == j).Count() == numero)
+                        {
+                            jaja.Add(j);
+                            tGuias += 1;
+                            tPeso = tPeso + tpeso;
+                            tVolumen = tVolumen + tvolumen;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    async Task checkGuia(string guia)
+    {
+        var j = checkedValues.ToList();
+        j.Add(guia);
+        checkedValues = j;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        oRtaViaje = await http.GetFromJsonAsync<Respuesta<Viaje>>($"/api/viaje/{id}");
+        oViaje = oRtaViaje.List;
+        if (oViaje.TotalBultos > 0) totalBultos = (double)oViaje.TotalBultos;
+        oViaje.TimeCargando = DateTime.Now;
+        foreach (var id in JsonSerializer.Deserialize<List<int>>(oViaje.Guias))
+        {
+            var response = await http.GetFromJsonAsync<Respuesta<Guium>>($"/api/guia/{id}");
+            oGuias.Add(response.List);
+        }
+
+        foreach (var guia in oGuias)
+        {
+            obj1 a = new();
+            List<string> j = new();
+            foreach (var i in Enumerable.Range(1, (int)guia.Bulto))
+            {
+                if (i < 10) j.Add($"{guia.Guia}S00{i}");
+                else if (i < 100) j.Add($"{guia.Guia}S0{i}");
+                else j.Add($"{guia.Guia}S{i}");
+            }
+            a.Bultos = j;
+            a.Guia = $"Guia {guia.Guia}";
+            objeto1.Add(a);
+        }
+    }
+
+    public partial class obj1
+    {
+        public string? Guia { get; set; }
+        public List<string>? Bultos { get; set; }
+        public bool cargada { get; set; }
+    }
+
+    public async Task alertaTerminar()
+    {
+        SweetAlertResult result = await Swal.FireAsync(new SweetAlertOptions
+            {
+                Title = "¿Está seguro?",
+                Text = "Se finalizará la carga del viaje",
+                Icon = SweetAlertIcon.Success,
+                ShowCancelButton = true,
+                ConfirmButtonText = "Confirmar",
+                CancelButtonText = "Cancelar"
+            });
+
+        if (!string.IsNullOrEmpty(result.Value))
+        {
+            await terminar();
+        }
+        else if (result.Dismiss == DismissReason.Cancel)
+        {
+
+        }
+    }
+
+    async Task terminar()
+    {
+        oViaje.Estado = "ParaConfirmar";
+        oViaje.TimeEnCamion = DateTime.Now;
+        //impactar trazabilidad de las guias de que se termino de cargar
+        await http.PutAsJsonAsync<Viaje>("api/viaje", oViaje);
+        await gotoviajesdepo();
+    }
+
+    async Task gotoviajesdepo()
+    {
+        nav.NavigateTo("/viajesdepo");
+    }
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+
+    }
+
+}
