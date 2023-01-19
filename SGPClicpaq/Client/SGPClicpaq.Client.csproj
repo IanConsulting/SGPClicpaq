@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Pages\Hanghell\index.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Pages\Hanghell\Asdd" />
+    <None Remove="Pages\Hanghell\NewFile.txt" />
     <None Remove="Pages\Trafico\NewFile.txt" />
   </ItemGroup>
 
@@ -16,6 +22,7 @@
     <PackageReference Include="Feather.Blazor" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.9" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.9" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
     <PackageReference Include="Radzen.Blazor" Version="4.2.0" />
   </ItemGroup>
 

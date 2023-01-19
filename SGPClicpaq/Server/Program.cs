@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using SGPClicpaq.Server.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,8 +7,18 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+builder.Services.AddResponseCompression(o =>
+{
+    o.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+        new[] { "application/octet-stream" }
+        );
+});
+
 
 var app = builder.Build();
+
+app.UseResponseCompression();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -19,11 +30,18 @@ else
     app.UseExceptionHandler("/Error");
 }
 
+
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 
 app.UseRouting();
 
+
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<ChatHub>("/hubviaje");
+});
 
 app.MapRazorPages();
 app.MapControllers();

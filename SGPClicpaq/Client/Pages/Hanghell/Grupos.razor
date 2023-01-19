@@ -1,0 +1,73 @@
+﻿@page "/viajesencarga"
+
+@implements IAsyncDisposable
+
+
+<h3>Viajes en carga</h3>
+<input type="text" @bind="text" />
+<button @onclick="Send">Enviar</button>
+
+
+@foreach (string asdasd in texts)
+{
+    <a>@asdasd</a>
+    <br />
+}
+
+
+@code {
+    Respuesta<List<Viaje>> oRespuesta = new();
+    HubConnection hubConnection;
+    string text = "hola";
+    List<string> texts = new();
+
+    //public static Dictionary<int, string> Rooms = new Dictionary<int, string>()
+    //    {
+    //        {1,"Cervezas" },{2,"Programacion"},{3,"Moda"}
+    //    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+        .WithUrl(nav.ToAbsoluteUri("/hubviaje"))
+        .Build();
+
+        hubConnection.On<string>("ReceiveInformation", (textR) =>
+        {
+            texts.Add(textR);
+            text = "";
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+
+
+
+    }
+    public async Task Send() { await hubConnection.SendAsync("AddToGroup", "1"); Console.WriteLine("ENTRA"); }
+
+    public async Task Get()
+    {
+        var respuesta = await http.GetFromJsonAsync<Respuesta<List<Viaje>>>("/api/Viaje");
+        oRespuesta = respuesta;
+        oRespuesta.List = respuesta.List.Where(x => x.Estado == "En carga").ToList();
+        StateHasChanged();
+    }
+
+
+    public async Task Connect(int id)
+    {
+
+        await hubConnection.SendAsync("AddToGroup", 1);
+
+    }
+
+
+
+    public async ValueTask DisposeAsync()
+    {
+        await hubConnection.DisposeAsync();
+    }
+}
+
+
